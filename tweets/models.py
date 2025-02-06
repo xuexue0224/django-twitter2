@@ -13,10 +13,14 @@ class Tweet(models.Model):
         # (a CharField will instead store an empty string). The default is False.
         null=True,
         help_text = 'who posts this tweet',
-         verbose_name = u'谁发了这个题',
+        verbose_name = u'谁发了这个题',
         )
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        index_together = (('user', 'created_at'),)
+        ordering = ('user', '-created_at')
 
     @property
     def hours_to_now(self):
