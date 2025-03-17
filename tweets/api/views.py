@@ -1,28 +1,34 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from tweets.api.serializers import TweetSerializer, TweetSerializerForCreate
+from tweets.api.serializers import (
+    TweetSerializer, TweetSerializerForCreate, TweetSerializerWithComments)
 from tweets.models import Tweet
 from newsfeeds.services import NewsFeedService
+from utils.decorators import required_params
 
 
 class TweetViewSet(viewsets.GenericViewSet):
     serializer_class = TweetSerializerForCreate
+    queryset = Tweet.objects.all()
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action in ['list', 'retrieve']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
+    @required_params(params=['user_id'])
     def list(self, request):
-        if 'user_id' not in request.query_params:
-            return Response('missing user_id', status = 400)
-
-        tweets = Tweet.objects.filter(
-            user_id = request.query_params['user_id']
-        ).order_by('-created_at')
+        user_id = request.query_params['user_id']
+        tweets = Tweet.objects.filter(user_id = user_id).order_by('-created_at')
         serializer = TweetSerializer(tweets, many=True)
         return Response({'tweets': serializer.data})
+
+    def retrieve(self, request, *args, **kwargs):
+        # <HOMEWORK 1> 通过某个 query 参数 with_all_comments 来决定是否需要带上所有 comments
+        # <HOMEWORK 2> 通过某个 query 参数 with_preview_comments 来决定是否需要带上前三条 comments
+        tweet = self.get_object()
+        return Response(TweetSerializerWithComments(tweet).data)
 
     def create(self, request):
         serializer = TweetSerializerForCreate(
