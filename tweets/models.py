@@ -6,6 +6,7 @@ from likes.models import Like
 from django.contrib.contenttypes.models import ContentType
 # Create your models here.
 
+
 class Tweet(models.Model):
     user = models.ForeignKey\
         (User,

@@ -23,7 +23,7 @@ class Friendship(models.Model):
         index_together = (
             # 获取我关注的所有人，按照关注时间排序
             ('from_user_id', 'created_at'),
-            # 获取关注我的所有人，按照关注时间排序
+            # 获取关注我的所有人，按照关注时间排序，我是这里的 to_user_id
             ('to_user_id', 'created_at'),
         )
         unique_together =(('from_user_id', 'to_user_id'),)
