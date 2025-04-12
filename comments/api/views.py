@@ -8,6 +8,7 @@ from comments.api.serializers import (
     CommentSerializerForCreate,
     CommentSerializerForUpdate,
 )
+from inbox.services import NotificationService
 
 
 class CommentViewSet(viewsets.GenericViewSet):
@@ -68,6 +69,7 @@ class CommentViewSet(viewsets.GenericViewSet):
 
         # save 方法会出发 serializer 里的 create 方法，点进 save 的具体实现里可以看到
         comment = serializer.save()
+        NotificationService.send_comment_notification(comment)
         return Response(
             CommentSerializer(
                 comment,
