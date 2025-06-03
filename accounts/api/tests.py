@@ -20,10 +20,8 @@ class AccountApiTests(TestCase):
             password='correct password',
         )
 
-    #def createUser(self, username, email, password):
-        # 不能写成 User.objects.create()
-        # 因为 password 需要被加密，username 和 email 需要进行一些 normalize 处理
-    #    return User.objects.create_user(username, email, password)
+
+
 
     def test_login(self):
         # 每个测试函数必须以 test_ 开头，才会被自动调用进行测试
@@ -139,6 +137,7 @@ class AccountApiTests(TestCase):
         print(created_user_id)
         profile = UserProfile.objects.filter(user_id=created_user_id).first()
         self.assertNotEqual(profile, None)
+
 
         # 验证用户已经登入
         response = self.client.get(LOGIN_STATUS_URL)
