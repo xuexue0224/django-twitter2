@@ -12,6 +12,7 @@ from django.contrib.auth import(
     logout as django_logout,
 )
 from accounts.api.serializers import UserSerializer
+#from accounts.models import User
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -73,6 +74,9 @@ class AccountViewSet(viewsets.ViewSet):
 
         user = serializer.save()
         django_login(request, user)
+
+
+
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
