@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers, exceptions
+#from accounts.models import UserProfile
 
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('id', 'username', 'email')
 
 
 class UserSerializerForTweet(serializers.ModelSerializer):
@@ -46,7 +47,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'email')
+        fields = ('username', 'password', 'email',)
 
     # will be called when is_valid is called
     def validate(self, data):
@@ -69,4 +70,7 @@ class SignupSerializer(serializers.ModelSerializer):
             password = password,
             email = email,
         )
+        # Create UserProfile object
+        user.profile
+
         return user

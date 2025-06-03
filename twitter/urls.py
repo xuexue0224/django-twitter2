@@ -23,6 +23,7 @@ from rest_framework import routers
 from tweets.api.views import TweetViewSet
 from likes.api.views import LikeViewSet
 from inbox.api.views import NotificationViewSet
+from accounts.models import UserProfile
 
 
 
@@ -35,6 +36,8 @@ router.register(r'api/newsfeeds', NewsFeedViewSet, basename='newsfeeds')
 router.register(r'api/comments', CommentViewSet, basename='comments')
 router.register(r'api/likes', LikeViewSet, basename='likes')
 router.register(r'api/notifications', NotificationViewSet, basename='notifications')
+router.register(r'api/notifications', NotificationViewSet, basename='notifications')
+
 
 
 
