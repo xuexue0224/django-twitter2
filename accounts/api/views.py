@@ -2,17 +2,23 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, status
 from rest_framework import permissions
 from rest_framework.decorators import action
-from accounts.api.serializers import UserSerializer, LoginSerializer, SignupSerializer
+from accounts.api.serializers import (
+    UserSerializer,
+    UserProfileSerializerForUpdate,
+    LoginSerializer,
+    SignupSerializer,
+    UserSerializerWithProfile,
+)
+from accounts.models import UserProfile
 from rest_framework.response import Response
-#from rest_framework.decorators import actions
 from rest_framework.permissions import AllowAny
-from django.contrib.auth import(
+from django.contrib.auth import (
     authenticate as django_authenticate,
     login as django_login,
     logout as django_logout,
 )
-from accounts.api.serializers import UserSerializer
-#from accounts.models import User
+from utils.permissions import IsObjectOwner
+
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -20,8 +26,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     API endpoint that allows users to be viewed or edited
     """
     queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = UserSerializerWithProfile
+    permission_classes = (permissions.IsAdminUser,)
 
 
 class AccountViewSet(viewsets.ViewSet):
@@ -75,9 +81,18 @@ class AccountViewSet(viewsets.ViewSet):
         user = serializer.save()
         django_login(request, user)
 
-
-
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
         }, status = 201)
+
+
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    viewsets.mixins.UpdateModelMixin,
+):
+    queryset = UserProfile
+
+    # PUT /api/profiles/<id>/
+    permission_classes = (permissions.IsAuthenticated, IsObjectOwner,)
+    serializer_class = UserProfileSerializerForUpdate
