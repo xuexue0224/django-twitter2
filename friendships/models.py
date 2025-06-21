@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save, pre_delete
+from friendships.listeners import invalidate_following_cache
 
 # Create your models here.
 
@@ -30,3 +32,9 @@ class Friendship(models.Model):
 
     def __str__(self):
         return '{} followed {}'.format(self.from_user_id, self.to_user_id)
+
+
+# hook up with listeners to invalidate cache
+pre_delete.connect(invalidate_following_cache, sender=Friendship)
+# update 和 创建都会激活 post_save
+post_save.connect(invalidate_following_cache, sender=Friendship)
