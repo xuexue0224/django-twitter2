@@ -2,22 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_delete
 from friendships.listeners import invalidate_following_cache
-
-# Create your models here.
+from accounts.services import UserService
 
 # from user 关注了 to user
+
+
 class Friendship(models.Model):
     from_user = models.ForeignKey(
         User,
-        on_delete = models.SET_NULL,
-        null = True,
-        related_name = 'following_friendship_set',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='following_friendship_set',
     )
     to_user = models.ForeignKey(
         User,
-        on_delete = models.SET_NULL,
-        null = True,
-        related_name = 'follower_friendship_set',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='follower_friendship_set',
     )
     created_at = models.DateTimeField(auto_now_add = True)
 
@@ -32,6 +33,14 @@ class Friendship(models.Model):
 
     def __str__(self):
         return '{} followed {}'.format(self.from_user_id, self.to_user_id)
+
+    @property
+    def cached_from_user(self):
+        return UserService.get_user_through_cache(self.from_user_id)
+
+    @property
+    def cached_to_user(self):
+        return UserService.get_user_through_cache(self.to_user_id)
 
 
 # hook up with listeners to invalidate cache

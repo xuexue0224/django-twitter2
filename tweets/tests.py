@@ -10,6 +10,9 @@ from tweets.constants import TweetPhotoStatus
 
 class TweetTests(TestCase):
 
+    def setUp(self):
+        self.clear_cache()
+
     def test_hours_to_now(self):
         linghu = User.objects.create_user(username='linghu')
         tweet = Tweet.objects.create(user=linghu, content = 'Jiuzhang Dafa Good!')
