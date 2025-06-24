@@ -1,3 +1,4 @@
+from accounts.services import UserService
 from accounts.api.serializers import UserSerializerForFriendship
 from friendships.models import Friendship
 from rest_framework import serializers
@@ -20,12 +21,14 @@ class FollowingUserIdSetMixin:
         setattr(self, '_cached_following_user_id_set', user_id_set)
         return user_id_set
 
+
 # 可以通过 source=xxx 制定去访问每个 model instance 的 xxx 方法
 # 即 model_instance.xxx 来获得数据
 # https://www.django-rest-framework.org/api-guide/serializers/#specifying-fields-explicitly
 # 关注我的人
 class FollowerSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
-    user = UserSerializerForFriendship(source = 'from_user')
+    user = UserSerializerForFriendship(source='cached_from_user')
+    created_at = serializers.DateTimeField()
     has_followed = serializers.SerializerMethodField()
 
     class Meta:
@@ -41,7 +44,8 @@ class FollowerSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
 
 # 我关注的人
 class FollowingSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
-    user = UserSerializerForFriendship(source='to_user')
+    user = UserSerializerForFriendship(source='cached_to_user')
+    created_at = serializers.DateTimeField()
     has_followed = serializers.SerializerMethodField()
 
     class Meta:
@@ -81,6 +85,7 @@ class FriendshipSerializerForCreate(serializers.ModelSerializer):
                 'message': 'You cano not follow a non-exist user.',
             })
         return attrs
+
     def create(self, validated_data):
         return Friendship.objects.create(
             from_user_id = validated_data['from_user_id'],

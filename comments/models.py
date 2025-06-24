@@ -1,3 +1,4 @@
+from accounts.services import UserService
 from django.db import models
 from django.contrib.auth.models import User
 from tweets.models import Tweet
@@ -5,6 +6,7 @@ from likes.models import Like
 from django.contrib.contenttypes.models import ContentType
 
 # Create your models here.
+
 
 class Comment(models.Model):
     """
@@ -21,13 +23,6 @@ class Comment(models.Model):
         # 有在某个 tweet 下排序所有 comments 的需求
         index_together = (('tweet', 'created_at'),)
 
-    @property
-    def like_set(self):
-        return Like.objects.filter(
-            content_type=ContentType.objects.get_for_model(Comment),
-            object_id=self.id,
-        ).order_by('-created_at')
-
     def __str__(self):
         return '{} - {} says {} at tweet {}'.format(
             self.created_at,
@@ -35,3 +30,15 @@ class Comment(models.Model):
             self.content,
             self.tweet_id,
         )
+
+    @property
+    def like_set(self):
+        return Like.objects.filter(
+            content_type=ContentType.objects.get_for_model(Comment),
+            object_id=self.id,
+        ).order_by('-created_at')
+
+    @property
+    def cached_user(self):
+        return UserService.get_user_through_cache(self.user_id)
+
