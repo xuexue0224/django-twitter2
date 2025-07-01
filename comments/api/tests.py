@@ -63,8 +63,8 @@ class CommentApiTests(TestCase):
         })
         self.assertEqual(response.status_code, 201)
         print('-----------------------------------\n')
-        print(response.data['user'])
-        self.assertEqual(response.data['user'], self.linghu.id)
+        print(response.data)
+        self.assertEqual(response.data['user']['id'], self.linghu.id)
         print('-----------------------------------')
 
         self.assertEqual(response.data['tweet_id'], self.tweet.id)

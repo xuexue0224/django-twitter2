@@ -36,11 +36,11 @@ class Friendship(models.Model):
 
     @property
     def cached_from_user(self):
-        return MemcachedHelper.invalidate_cached_object(User, self.from_user_id)
+        return MemcachedHelper.get_object_through_cache(User, self.from_user_id)
 
     @property
     def cached_to_user(self):
-        return MemcachedHelper.invalidate_cached_object(User, self.to_user_id)
+        return MemcachedHelper.get_object_through_cache(User, self.to_user_id)
 
 
 # hook up with listeners to invalidate cache
