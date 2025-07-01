@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from tweets.models import Tweet
 from likes.models import Like
 from django.contrib.contenttypes.models import ContentType
-
-# Create your models here.
+from utils.memcached_helper import MemcachedHelper
+from utils.listeners import invalidate_object_cache
+from django.db.models.signals import post_save, pre_delete
 
 
 class Comment(models.Model):
@@ -40,5 +41,5 @@ class Comment(models.Model):
 
     @property
     def cached_user(self):
-        return UserService.get_user_through_cache(self.user_id)
+        return MemcachedHelper.invalidate_cached_object(User, self.user_id)
 
