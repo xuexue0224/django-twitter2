@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from newsfeeds.models import NewsFeed
 from newsfeeds.api.serializers import NewsFeedSerializer
 from utils.paginations import EndlessPagination
+from newsfeeds.services import NewsFeedService
 
 
 class NewsFeedViewSet(viewsets.GenericViewSet):
@@ -16,7 +17,7 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         # 只能看 user=当前登录用户的 newsfeed
         # 也可以是 self.request.user.newsfeed_set.all()
         # 但是一般最好还是按照 NewsFeed.objects.filter 的方式写，更清晰直观
-        return NewsFeed.objects.filter(user=self.request.user)
+        return NewsFeedService.get_cached_newsfeeds(self.request.user.id)
 
     def list(self, request):
         queryset = self.get_queryset()
