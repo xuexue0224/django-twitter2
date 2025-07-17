@@ -20,9 +20,12 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         return NewsFeedService.get_cached_newsfeeds(self.request.user.id)
 
     def list(self, request):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-
+        cached_newsfeeds = self.get_queryset()
+        page = self.paginator.paginate_cached_list(cached_newsfeeds, request)
+        # page 是 None 代表我现在请求的数据可能不在 cache 里，需要直接去 db 来获取
+        if page is None:
+            queryset = NewsFeed.objects.filter(user=request.user)
+            page = self.paginate_queryset(queryset)
         serializer = NewsFeedSerializer(
             page,
             context={'request': request},
